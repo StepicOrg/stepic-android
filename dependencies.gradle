@@ -87,9 +87,9 @@ ext.versions = [
         MPAndroidChart       : 'v3.0.3',
 
         shortcutBadger       : '1.1.19@aar',
-        StoriesKit           : '1.1.1',
-        AdapterDelegates     : '1.0.1',
-        Adapters             : '1.0.1',
+        StoriesKit           : '1.1.2',
+        AdapterDelegates     : '1.1.0',
+        Adapters             : '1.1.0',
 
         leakCanary           : '1.5.1',
         crashlytics          : '17.1.0',
@@ -109,7 +109,7 @@ ext.versions = [
 
         flipper              : '0.49.0',
         soloader             : '0.9.0',
-        toolargetool         : '0.2.1@aar'
+        toolargetool         : '0.3.0'
 ]
 
 ext.gradlePlugins = [
@@ -157,7 +157,8 @@ ext.libraries = [
         multidex             : "androidx.multidex:multidex:$versions.multidex",
 
         androidKit           : [
-                adapters             : "ru.nobird.android.ui:Adapters:$versions.adapters",
+                adapters             : "ru.nobird.android.ui:adapters:$versions.adapters",
+                adapterDelegates     : "ru.nobird.android.ui:adapter-delegates:$versions.adapters",
                 presentationBase     : "ru.nobird.android.presentation:base:$versions.presentationBase",
                 presentationRedux    : "ru.nobird.android.presentation:redux:$versions.presentationRedux",
                 presentationReduxRx  : "ru.nobird.android.presentation:redux-rx:$versions.presentationRedux",
@@ -212,7 +213,7 @@ ext.libraries = [
         MPAndroidChart       : "com.github.PhilJay:MPAndroidChart:$versions.MPAndroidChart",
 
         shortcutBadger       : "me.leolin:ShortcutBadger:$versions.shortcutBadger",
-        StoriesKit           : "ru.nobird.android:StoriesKit:$versions.StoriesKit",
+        StoriesKit           : "ru.nobird.android:storieskit:$versions.StoriesKit",
 
         // Developer Tools
         leakCanary           : "com.squareup.leakcanary:leakcanary-android:$versions.leakCanary",

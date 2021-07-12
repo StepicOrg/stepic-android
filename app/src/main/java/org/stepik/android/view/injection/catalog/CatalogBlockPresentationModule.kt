@@ -22,7 +22,7 @@ import org.stepik.android.presentation.user_courses.dispatcher.UserCoursesAction
 import org.stepik.android.presentation.wishlist.dispatcher.WishlistActionDispatcher
 import ru.nobird.android.core.model.safeCast
 import ru.nobird.android.presentation.redux.container.wrapWithViewContainer
-import ru.nobird.android.presentation.redux.dispatcher.tranform
+import ru.nobird.android.presentation.redux.dispatcher.transform
 import ru.nobird.android.presentation.redux.dispatcher.wrapWithActionDispatcher
 import ru.nobird.android.presentation.redux.feature.ReduxFeature
 
@@ -54,49 +54,49 @@ object CatalogBlockPresentationModule {
             )
                 .wrapWithActionDispatcher(catalogActionDispatcher)
                 .wrapWithActionDispatcher(
-                    storiesActionDispatcher.tranform(
+                    storiesActionDispatcher.transform(
                         transformAction = { it.safeCast<CatalogFeature.Action.StoriesAction>()?.action },
                         transformMessage = CatalogFeature.Message::StoriesMessage
                     )
                 )
                 .wrapWithActionDispatcher(
-                    filtersActionDispatcher.tranform(
+                    filtersActionDispatcher.transform(
                         transformAction = { it.safeCast<CatalogFeature.Action.FiltersAction>()?.action },
                         transformMessage = CatalogFeature.Message::FiltersMessage
                     )
                 )
                 .wrapWithActionDispatcher(
-                    courseListActionDispatcher.tranform(
+                    courseListActionDispatcher.transform(
                         transformAction = { it.safeCast<CatalogFeature.Action.CourseListAction>()?.action },
                         transformMessage = { CatalogFeature.Message.CourseListMessage(it.id, it) }
                     )
                 )
                 .wrapWithActionDispatcher(
-                    courseContinueActionDispatcher.tranform(
+                    courseContinueActionDispatcher.transform(
                         transformAction = { it.safeCast<CatalogFeature.Action.CourseContinueAction>()?.action },
                         transformMessage = CatalogFeature.Message::CourseContinueMessage
                     )
                 )
                 .wrapWithActionDispatcher(
-                    userCoursesActionDispatcher.tranform(
+                    userCoursesActionDispatcher.transform(
                         transformAction = { null },
                         transformMessage = CatalogFeature.Message::UserCourseMessage
                     )
                 )
                 .wrapWithActionDispatcher(
-                    progressActionDispatcher.tranform(
+                    progressActionDispatcher.transform(
                         transformAction = { null },
                         transformMessage = CatalogFeature.Message::ProgressMessage
                     )
                 )
                 .wrapWithActionDispatcher(
-                    enrollmentActionDispatcher.tranform(
+                    enrollmentActionDispatcher.transform(
                         transformAction = { null },
                         transformMessage = CatalogFeature.Message::EnrollmentMessage
                     )
                 )
                 .wrapWithActionDispatcher(
-                    wishlistActionDispatcher.tranform(
+                    wishlistActionDispatcher.transform(
                         transformAction = { null },
                         transformMessage = CatalogFeature.Message::WishlistMessage
                     )

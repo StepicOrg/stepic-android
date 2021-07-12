@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_course_info.*
 import org.stepic.droid.R
@@ -40,7 +40,7 @@ class CourseInfoFragment : Fragment(), CourseInfoView {
     private var courseId: Long by argument()
 
     private lateinit var courseInfoAdapter: CourseInfoAdapter
-    private lateinit var courseInfoPresenter: CourseInfoPresenter
+    private val courseInfoPresenter: CourseInfoPresenter by viewModels { viewModelFactory }
 
     private lateinit var viewStateDelegate: ViewStateDelegate<CourseInfoView.State>
 
@@ -48,7 +48,6 @@ class CourseInfoFragment : Fragment(), CourseInfoView {
         super.onCreate(savedInstanceState)
         injectComponent(courseId)
 
-        courseInfoPresenter = ViewModelProviders.of(this, viewModelFactory).get(CourseInfoPresenter::class.java)
         savedInstanceState?.let(courseInfoPresenter::onRestoreInstanceState)
 
         courseInfoAdapter = CourseInfoAdapter(

@@ -13,8 +13,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -100,7 +100,7 @@ class CourseContentFragment :
     private lateinit var contentAdapter: CourseContentAdapter
     private var courseId: Long by argument()
 
-    private lateinit var courseContentPresenter: CourseContentPresenter
+    private val courseContentPresenter: CourseContentPresenter by viewModels { viewModelFactory }
 
     private lateinit var viewStateDelegate: ViewStateDelegate<CourseContentView.State>
 
@@ -119,7 +119,6 @@ class CourseContentFragment :
         super.onCreate(savedInstanceState)
         injectComponent(courseId)
 
-        courseContentPresenter = ViewModelProviders.of(this, viewModelFactory).get(CourseContentPresenter::class.java)
         savedInstanceState?.let(courseContentPresenter::onRestoreInstanceState)
     }
 

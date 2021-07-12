@@ -12,7 +12,7 @@ import org.stepik.android.presentation.course_benefits.dispatcher.CourseBenefitS
 import org.stepik.android.presentation.course_benefits.reducer.CourseBenefitsReducer
 import ru.nobird.android.core.model.safeCast
 import ru.nobird.android.presentation.redux.container.wrapWithViewContainer
-import ru.nobird.android.presentation.redux.dispatcher.tranform
+import ru.nobird.android.presentation.redux.dispatcher.transform
 import ru.nobird.android.presentation.redux.dispatcher.wrapWithActionDispatcher
 import ru.nobird.android.presentation.redux.feature.ReduxFeature
 
@@ -34,7 +34,7 @@ object CourseBenefitsPresentationModule {
                 courseBenefitSummaryState = CourseBenefitSummaryFeature.State.Loading
             ), courseBenefitsReducer)
                 .wrapWithActionDispatcher(
-                    courseBenefitSummaryActionDispatcher.tranform(
+                    courseBenefitSummaryActionDispatcher.transform(
                         transformAction = { it.safeCast<CourseBenefitsFeature.Action.CourseBenefitSummaryAction>()?.action },
                         transformMessage = CourseBenefitsFeature.Message::CourseBenefitSummaryMessage
                     )

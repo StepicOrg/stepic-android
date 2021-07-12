@@ -6,13 +6,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.ViewPager
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.ktx.get
@@ -119,7 +119,7 @@ class CourseActivity : FragmentActivityBase(), CourseView, InAppWebViewDialogFra
         }
     }
     private lateinit var coursePagerAdapter: CoursePagerAdapter
-    private lateinit var coursePresenter: CoursePresenter
+    private val coursePresenter: CoursePresenter by viewModels { viewModelFactory }
     private lateinit var courseHeaderDelegate: CourseHeaderDelegate
 
     private var unauthorizedDialogFragment: DialogFragment? = null
@@ -203,7 +203,6 @@ class CourseActivity : FragmentActivityBase(), CourseView, InAppWebViewDialogFra
             ?: intent.getCourseIdFromDeepLink()?.let { CourseViewSource.DeepLink(intent?.dataString ?: "") }
             ?: CourseViewSource.Unknown
 
-        coursePresenter = ViewModelProviders.of(this, viewModelFactory).get(CoursePresenter::class.java)
         courseHeaderDelegate =
             courseHeaderDelegateFactory
                 .create(

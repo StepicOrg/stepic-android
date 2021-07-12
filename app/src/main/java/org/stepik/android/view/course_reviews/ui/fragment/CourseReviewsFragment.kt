@@ -8,8 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -57,14 +57,13 @@ class CourseReviewsFragment : Fragment(), CourseReviewsView {
     private var courseId: Long by argument()
 
     private lateinit var courseReviewsAdapter: DefaultDelegateAdapter<CourseReviewItem>
-    private lateinit var courseReviewsPresenter: CourseReviewsPresenter
     private lateinit var viewStateDelegate: ViewStateDelegate<CourseReviewsView.State>
+
+    private val courseReviewsPresenter: CourseReviewsPresenter by viewModels { viewModelFactory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         injectComponent(courseId)
-
-        courseReviewsPresenter = ViewModelProviders.of(this, viewModelFactory).get(CourseReviewsPresenter::class.java)
 
         courseReviewsAdapter = DefaultDelegateAdapter()
         courseReviewsAdapter +=

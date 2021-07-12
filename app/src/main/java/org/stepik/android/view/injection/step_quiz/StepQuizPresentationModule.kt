@@ -19,7 +19,7 @@ import org.stepik.android.presentation.step_quiz_review.reducer.StepQuizReviewRe
 import org.stepik.android.presentation.step_quiz_review.reducer.StepQuizReviewTeacherReducer
 import ru.nobird.android.core.model.safeCast
 import ru.nobird.android.presentation.redux.container.wrapWithViewContainer
-import ru.nobird.android.presentation.redux.dispatcher.tranform
+import ru.nobird.android.presentation.redux.dispatcher.transform
 import ru.nobird.android.presentation.redux.dispatcher.wrapWithActionDispatcher
 import ru.nobird.android.presentation.redux.feature.ReduxFeature
 
@@ -53,7 +53,7 @@ object StepQuizPresentationModule {
             ReduxFeature(StepQuizReviewFeature.State.Idle, stepQuizReviewReducer)
                 .wrapWithActionDispatcher(stepQuizReviewActionDispatcher)
                 .wrapWithActionDispatcher(
-                    stepQuizActionDispatcher.tranform(
+                    stepQuizActionDispatcher.transform(
                         transformAction = { it.safeCast<StepQuizReviewFeature.Action.StepQuizAction>()?.action },
                         transformMessage = StepQuizReviewFeature.Message::StepQuizMessage
                     )
@@ -73,7 +73,7 @@ object StepQuizPresentationModule {
             ReduxFeature(StepQuizReviewTeacherFeature.State.Idle, stepQuizReviewTeacherReducer)
                 .wrapWithActionDispatcher(stepQuizReviewTeacherActionDispatcher)
                 .wrapWithActionDispatcher(
-                    stepQuizActionDispatcher.tranform(
+                    stepQuizActionDispatcher.transform(
                         transformAction = { it.safeCast<StepQuizReviewTeacherFeature.Action.StepQuizAction>()?.action },
                         transformMessage = StepQuizReviewTeacherFeature.Message::StepQuizMessage
                     )
