@@ -29,6 +29,7 @@ import org.stepik.android.view.base.ui.adapter.layoutmanager.TableLayoutManager
 import org.stepik.android.view.course.mapper.DisplayPriceMapper
 import org.stepik.android.view.course_list.delegate.CourseContinueViewDelegate
 import org.stepik.android.view.course_list.delegate.CourseListViewDelegate
+import org.stepik.android.view.course_list.resolver.TableLayoutHorizontalSpanCountResolver
 import org.stepik.android.view.ui.delegate.ViewStateDelegate
 import ru.nobird.android.core.model.PaginationDirection
 import ru.nobird.android.view.base.ui.extension.setOnPaginationListener
@@ -61,8 +62,12 @@ class CourseListPopularFragment : Fragment(R.layout.item_course_list), CourseLis
     @Inject
     internal lateinit var displayPriceMapper: DisplayPriceMapper
 
+    @Inject
+    internal lateinit var tableLayoutHorizontalSpanCountResolver: TableLayoutHorizontalSpanCountResolver
+
     private lateinit var courseListViewDelegate: CourseListViewDelegate
     private val courseListQueryPresenter: CourseListQueryPresenter by viewModels { viewModelFactory }
+    private lateinit var tableLayoutManager: TableLayoutManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,10 +80,12 @@ class CourseListPopularFragment : Fragment(R.layout.item_course_list), CourseLis
         containerCarouselCount.isVisible = false
         containerTitle.text = resources.getString(R.string.course_list_popular_toolbar_title)
 
+        val rowCount = resources.getInteger(R.integer.course_list_rows)
+        val columnsCount = resources.getInteger(R.integer.course_list_columns)
+        tableLayoutManager = TableLayoutManager(requireContext(), columnsCount, rowCount, RecyclerView.HORIZONTAL, false)
+
         with(courseListCoursesRecycler) {
-            val rowCount = resources.getInteger(R.integer.course_list_rows)
-            val columnsCount = resources.getInteger(R.integer.course_list_columns)
-            layoutManager = TableLayoutManager(context, columnsCount, rowCount, RecyclerView.HORIZONTAL, false)
+            layoutManager = tableLayoutManager
             itemAnimator?.changeDuration = 0
             val snapHelper = CoursesSnapHelper(rowCount)
             snapHelper.attachToRecyclerView(this)
@@ -154,6 +161,13 @@ class CourseListPopularFragment : Fragment(R.layout.item_course_list), CourseLis
         val courseListState = (state as? CourseListQueryView.State.Data)?.courseListViewState ?: CourseListView.State.Idle
         if (courseListState == CourseListView.State.Empty) {
             analytic.reportEvent(Analytic.Error.FEATURED_EMPTY)
+        }
+        if (courseListState is CourseListView.State.Content) {
+            tableLayoutHorizontalSpanCountResolver.resolveSpanCount(courseListState.courseListDataItems.size).let { resolvedSpanCount ->
+                if (tableLayoutManager.spanCount != resolvedSpanCount) {
+                    tableLayoutManager.spanCount = resolvedSpanCount
+                }
+            }
         }
         courseListViewDelegate.setState(courseListState)
     }

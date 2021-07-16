@@ -27,6 +27,7 @@ import org.stepik.android.presentation.profile_courses.ProfileCoursesView
 import org.stepik.android.view.base.ui.adapter.layoutmanager.TableLayoutManager
 import org.stepik.android.view.course.mapper.DisplayPriceMapper
 import org.stepik.android.view.course_list.delegate.CourseContinueViewDelegate
+import org.stepik.android.view.course_list.resolver.TableLayoutHorizontalSpanCountResolver
 import org.stepik.android.view.course_list.ui.adapter.delegate.CourseListItemAdapterDelegate
 import org.stepik.android.view.ui.delegate.ViewStateDelegate
 import ru.nobird.android.ui.adapters.DefaultDelegateAdapter
@@ -61,6 +62,9 @@ class ProfileCoursesFragment : Fragment(R.layout.fragment_profile_courses), Prof
     @Inject
     internal lateinit var displayPriceMapper: DisplayPriceMapper
 
+    @Inject
+    internal lateinit var tableLayoutHorizontalSpanCountResolver: TableLayoutHorizontalSpanCountResolver
+
     private var userId by argument<Long>()
 
     private val profileCoursesPresenter: ProfileCoursesPresenter by viewModels { viewModelFactory }
@@ -68,6 +72,7 @@ class ProfileCoursesFragment : Fragment(R.layout.fragment_profile_courses), Prof
 
     private lateinit var coursesAdapter: DefaultDelegateAdapter<CourseListItem>
     private lateinit var viewStateDelegate: ViewStateDelegate<ProfileCoursesView.State>
+    private lateinit var tableLayoutManager: TableLayoutManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,10 +125,12 @@ class ProfileCoursesFragment : Fragment(R.layout.fragment_profile_courses), Prof
         setDataToPresenter()
         tryAgain.setOnClickListener { setDataToPresenter(forceUpdate = true) }
 
+        val rowCount = resources.getInteger(R.integer.course_list_rows)
+        val columnsCount = resources.getInteger(R.integer.course_list_columns)
+        tableLayoutManager = TableLayoutManager(requireContext(), columnsCount, rowCount, RecyclerView.HORIZONTAL, false)
+
         with(profileCoursesRecycler) {
-            val rowCount = resources.getInteger(R.integer.course_list_rows)
-            val columnsCount = resources.getInteger(R.integer.course_list_columns)
-            layoutManager = TableLayoutManager(context, columnsCount, rowCount, RecyclerView.HORIZONTAL, false)
+            layoutManager = tableLayoutManager
 
             adapter = coursesAdapter
             itemAnimator?.changeDuration = 0
@@ -155,6 +162,11 @@ class ProfileCoursesFragment : Fragment(R.layout.fragment_profile_courses), Prof
                 coursesAdapter.items = state.courseListDataItems
                 (profileCoursesRecycler.layoutManager as? GridLayoutManager)
                     ?.spanCount = min(resources.getInteger(R.integer.course_list_rows), state.courseListDataItems.size)
+            }
+        }
+        tableLayoutHorizontalSpanCountResolver.resolveSpanCount(coursesAdapter.itemCount).let { resolvedSpanCount ->
+            if (tableLayoutManager.spanCount != resolvedSpanCount) {
+                tableLayoutManager.spanCount = resolvedSpanCount
             }
         }
     }

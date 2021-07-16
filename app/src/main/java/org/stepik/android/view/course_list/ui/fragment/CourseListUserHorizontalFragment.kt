@@ -30,6 +30,7 @@ import org.stepik.android.view.base.ui.adapter.layoutmanager.TableLayoutManager
 import org.stepik.android.view.course.mapper.DisplayPriceMapper
 import org.stepik.android.view.course_list.delegate.CourseContinueViewDelegate
 import org.stepik.android.view.course_list.delegate.CourseListViewDelegate
+import org.stepik.android.view.course_list.resolver.TableLayoutHorizontalSpanCountResolver
 import org.stepik.android.view.ui.delegate.ViewStateDelegate
 import ru.nobird.android.core.model.PaginationDirection
 import ru.nobird.android.view.base.ui.extension.setOnPaginationListener
@@ -67,9 +68,13 @@ class CourseListUserHorizontalFragment : Fragment(R.layout.fragment_user_course_
     @Inject
     internal lateinit var onboardingSplitTestVersion2: OnboardingSplitTestVersion2
 
+    @Inject
+    internal lateinit var tableLayoutHorizontalSpanCountResolver: TableLayoutHorizontalSpanCountResolver
+
     private lateinit var courseListViewDelegate: CourseListViewDelegate
     private val courseListPresenter: CourseListUserPresenter by viewModels { viewModelFactory }
     private lateinit var wrapperViewStateDelegate: ViewStateDelegate<CourseListUserView.State>
+    private lateinit var tableLayoutManager: TableLayoutManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,11 +85,12 @@ class CourseListUserHorizontalFragment : Fragment(R.layout.fragment_user_course_
         super.onViewCreated(view, savedInstanceState)
 
         containerTitle.text = resources.getString(R.string.course_list_user_courses_title)
+        val rowCount = resources.getInteger(R.integer.course_list_rows)
+        val columnsCount = resources.getInteger(R.integer.course_list_columns)
+        tableLayoutManager = TableLayoutManager(requireContext(), columnsCount, rowCount, RecyclerView.HORIZONTAL, false)
 
         with(courseListCoursesRecycler) {
-            val rowCount = resources.getInteger(R.integer.course_list_rows)
-            val columnsCount = resources.getInteger(R.integer.course_list_columns)
-            layoutManager = TableLayoutManager(context, columnsCount, rowCount, RecyclerView.HORIZONTAL, false)
+            layoutManager = tableLayoutManager
             itemAnimator?.changeDuration = 0
             val snapHelper = CoursesSnapHelper(rowCount)
             snapHelper.attachToRecyclerView(this)
@@ -197,6 +203,11 @@ class CourseListUserHorizontalFragment : Fragment(R.layout.fragment_user_course_
                 state.userCourses.size,
                 state.userCourses.size
             )
+            tableLayoutHorizontalSpanCountResolver.resolveSpanCount(state.userCourses.size).let { resolvedSpanCount ->
+                if (tableLayoutManager.spanCount != resolvedSpanCount) {
+                    tableLayoutManager.spanCount = resolvedSpanCount
+                }
+            }
         }
         val courseListState = (state as? CourseListUserView.State.Data)?.courseListViewState ?: CourseListView.State.Idle
         courseListViewDelegate.setState(courseListState)

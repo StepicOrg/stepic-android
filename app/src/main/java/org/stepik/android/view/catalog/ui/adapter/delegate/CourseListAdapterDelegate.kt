@@ -3,6 +3,9 @@ package org.stepik.android.view.catalog.ui.adapter.delegate
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
+import kotlinx.android.synthetic.main.fragment_user_course_list.*
 import kotlinx.android.synthetic.main.header_catalog_block.view.*
 import kotlinx.android.synthetic.main.item_course_list_new.view.*
 import org.stepic.droid.R
@@ -22,6 +25,7 @@ import org.stepik.android.view.catalog.mapper.CourseCountMapper
 import org.stepik.android.view.catalog.model.CatalogItem
 import org.stepik.android.view.catalog.ui.delegate.CatalogBlockHeaderDelegate
 import org.stepik.android.view.course.mapper.DisplayPriceMapper
+import org.stepik.android.view.course_list.resolver.TableLayoutHorizontalSpanCountResolver
 import org.stepik.android.view.course_list.ui.adapter.delegate.CourseListItemAdapterDelegate
 import org.stepik.android.view.course_list.ui.adapter.delegate.CourseListPlaceHolderAdapterDelegate
 import org.stepik.android.view.course_list.ui.adapter.delegate.CourseListViewAllAdapterDelegate
@@ -31,16 +35,19 @@ import ru.nobird.android.ui.adapterdelegates.AdapterDelegate
 import ru.nobird.android.ui.adapterdelegates.DelegateViewHolder
 import ru.nobird.android.ui.adapters.DefaultDelegateAdapter
 
-class CourseListAdapterDelegate(
+class CourseListAdapterDelegate
+@AssistedInject
+constructor(
     private val analytic: Analytic,
     private val courseCountMapper: CourseCountMapper,
-    private val isHandleInAppPurchase: Boolean,
+    @Assisted private val isHandleInAppPurchase: Boolean,
     private val defaultPromoCodeMapper: DefaultPromoCodeMapper,
     private val displayPriceMapper: DisplayPriceMapper,
-    private val onTitleClick: (Long) -> Unit,
-    private val onBlockSeen: (String, CatalogBlockContent.FullCourseList) -> Unit,
-    private val onCourseContinueClicked: (Course, CourseViewSource, CourseContinueInteractionSource) -> Unit,
-    private val onCourseClicked: (CourseListItem.Data) -> Unit
+    @Assisted private val onTitleClick: (Long) -> Unit,
+    @Assisted private val onBlockSeen: (String, CatalogBlockContent.FullCourseList) -> Unit,
+    @Assisted private val onCourseContinueClicked: (Course, CourseViewSource, CourseContinueInteractionSource) -> Unit,
+    @Assisted private val onCourseClicked: (CourseListItem.Data) -> Unit,
+    private val tableLayoutHorizontalSpanCountResolver: TableLayoutHorizontalSpanCountResolver
 ) : AdapterDelegate<CatalogItem, DelegateViewHolder<CatalogItem>>() {
     private val sharedViewPool = RecyclerView.RecycledViewPool()
 
@@ -68,6 +75,8 @@ class CourseListAdapterDelegate(
         private val courseItemAdapter: DefaultDelegateAdapter<CourseListItem> = DefaultDelegateAdapter()
         private val viewStateDelegate = ViewStateDelegate<CourseListFeature.State>()
 
+        private var tableLayoutManager: TableLayoutManager
+
         init {
             viewStateDelegate.addState<CourseListFeature.State.Idle>(courseListCoursesRecycler)
             viewStateDelegate.addState<CourseListFeature.State.Loading>(courseListTitleContainer, courseListCoursesRecycler)
@@ -92,16 +101,17 @@ class CourseListAdapterDelegate(
                 onTitleClick(block.courseList.id)
             }
 
+            val rowCount = context.resources.getInteger(R.integer.course_list_rows)
+            val columnsCount = context.resources.getInteger(R.integer.course_list_columns)
+            tableLayoutManager = TableLayoutManager(context, columnsCount, rowCount, RecyclerView.HORIZONTAL, false)
+
             with(courseListCoursesRecycler) {
                 adapter = courseItemAdapter
-                val rowCount = resources.getInteger(R.integer.course_list_rows)
-                val columnsCount = resources.getInteger(R.integer.course_list_columns)
-                layoutManager = TableLayoutManager(context, columnsCount, rowCount, RecyclerView.HORIZONTAL, false)
+                layoutManager = tableLayoutManager
                 itemAnimator?.changeDuration = 0
                 val snapHelper = CoursesSnapHelper(rowCount)
                 snapHelper.attachToRecyclerView(this)
                 setRecycledViewPool(sharedViewPool)
-                setHasFixedSize(true)
             }
         }
 
@@ -142,6 +152,12 @@ class CourseListAdapterDelegate(
                             state.courseListItems
                         }
                     } ?: state.courseListItems
+
+                    tableLayoutHorizontalSpanCountResolver.resolveSpanCount(courseItemAdapter.itemCount).let { resolvedSpanCount ->
+                        if (tableLayoutManager.spanCount != resolvedSpanCount) {
+                            tableLayoutManager.spanCount = resolvedSpanCount
+                        }
+                    }
                 }
 
                 else ->
